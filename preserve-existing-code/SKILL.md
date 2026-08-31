@@ -1,4 +1,4 @@
-﻿---
+---
 name: preserve-existing-code
 description: Preserve all existing code during implementation and refactoring. Use whenever editing source code under a strict no-deletion policy: comment out replaced code instead of deleting it, retain original logic for traceability, and mark every newly written code block with explicit Codex-added comments.
 ---
