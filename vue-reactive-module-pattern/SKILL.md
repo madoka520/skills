@@ -206,21 +206,33 @@ const ExampleModule = (() => {
 
 1. 组件放在页面目录的 `_components/` 下，由用户后续替换，不改组件库源码
 2. 组件是纯展示：动作通过 `emits` 上抛给页面绑定到模块方法；组件内不写业务逻辑，也不接收整个响应式模块对象作 props
-3. 数据传递方式：只读数据与表单对象走 props（表单对象为引用共享，嵌套字段在组件内直接 `v-model` 绑定）；弹窗显隐用 `defineModel<boolean>`。**表单对象不要用 `defineModel`**——defineModel 的语义是子组件可整体替换该值，而表单只是嵌套改字段，属于 props 引用共享。例如：
+3. 数据传递方式：只读数据走 props；**弹窗组件自持显隐与表单，`defineExpose({ open })` 暴露打开方法**，编辑目标经 `open(initial?)` 参数传入（打开时初始化、保存成功自关），结果经 `emits`（如 `saved`）回传页面做联动刷新。父级经 `useTemplateRef` 调 `open`，**不在外部存放弹窗的 visible / editing 状态，也不用 `defineModel`/props 传表单**。例如：
 
 ```ts
-// 弹窗开关（v-model，与父级 Form.groupVisible 双向绑定）
-const visible = defineModel<boolean>({ default: false })
+// 弹窗内部：显隐与表单均为组件状态
+const visible = ref(false)
+const form = reactive({ id: 0, name: '', url: '', color: '' })
 
-// 表单数据（props 引用共享）
-withDefaults(
-  defineProps<{
-    form: { id: number; name: string; url: string; color: string }
-  }>(),
-  {},
-)
+// 打开弹窗：initial 为编辑目标（新建时省略）
+const open = (initial?: XxxSummary | null) => {
+  form.id = initial?.id ?? 0
+  // ...其余字段初始化
+  visible.value = true
+}
 
-defineEmits<{ save: [] }>()
+const handleSave = async () => {
+  await api.save(form)
+  visible.value = false
+  emit('saved')
+}
+
+defineExpose({ open })
+```
+
+```vue
+<!-- 父级：模板 ref 命令式调用，不存任何弹窗状态 -->
+<XxxDialog ref="xxxDialog" @saved="Grid.onXxxSaved" />
+<!-- 触发点：@edit="xxxDialog?.open(row)" / @add="xxxDialog?.open()" -->
 ```
 
 4. `defineProps` 统一用 `withDefaults` 包裹（与组件库风格一致）：可选 prop 给默认值，全必填时用 `{}` 占位
@@ -245,7 +257,7 @@ defineEmits<{ save: [] }>()
 - 是否符合当前文件已有命名习惯
 - 拆分出的组件是否为纯展示（emits 上抛动作，逻辑留在模块）
 - 是否没有把整个响应式模块对象作为 props 传入组件
-- 弹窗组件显隐是否用 `defineModel<boolean>`；表单对象是否走 props（未误用 defineModel）
+- 弹窗是否自持 visible + `defineExpose({ open })`，父级未存放 visible/editing 状态
 - `defineProps` 是否统一用了 `withDefaults` 包裹
 
 ## 输出要求
@@ -280,8 +292,8 @@ defineEmits<{ save: [] }>()
 - 表单字段散落平铺在响应体里（应聚合为对象）
 - 组件里写业务逻辑（应上抛 emits 由模块处理）
 - 把整个响应式模块对象传给组件作 props（应拆成只读 props + 表单对象 props + emits）
-- 弹窗开关通过 props 传 visible 字段（应用 defineModel + v-model）
-- 表单对象用 `defineModel` 传递（对象 model 语义是整体可替换，表单只是嵌套改字段，应用 props 引用共享）
+- 外部存放弹窗的 visible / editing 状态（弹窗应 defineExpose open(initial?) 自治）
+- 用 `defineModel`/props 传弹窗显隐与表单对象（编辑目标应经 open 参数传入）
 - 裸用 `defineProps`（应统一 `withDefaults(defineProps<...>(), {...})`）
 
 ## 示例提示词
