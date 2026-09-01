@@ -200,6 +200,30 @@ const ExampleModule = (() => {
 - `mapXxx`
 - 与组件生命周期无关的纯计算
 
+## 页面拆分与组件约定
+
+页面文件过长时，把纯展示部分拆分为独立组件，业务逻辑全部留在页面的响应式模块中：
+
+1. 组件放在页面目录的 `_components/` 下，由用户后续替换，不改组件库源码
+2. 组件是纯展示：动作通过 `emits` 上抛给页面绑定到模块方法；组件内不写业务逻辑
+3. 响应式模块对象可以作为 props 整体传入组件（响应式引用透传），用结构类型 `interface` 声明模块形状，例如：
+
+```ts
+interface FormModule {
+  groupForm: { id: number; name: string; url: string; color: string }
+  handleSaveGroup: () => Promise<void>
+}
+
+withDefaults(
+  defineProps<{ form: FormModule }>(),
+  {},
+)
+```
+
+4. 弹窗组件的显隐必须用 `defineModel<boolean>` 控制，父级 `v-model` 绑定模块的 visible 字段；不要把 visible 混进 props 的模块类型里
+5. `defineProps` 统一用 `withDefaults` 包裹（与组件库风格一致）：可选 prop 给默认值，全必填时用 `{}` 占位
+6. 样式随组件走（scoped 自包含）；拆分组件时把对应样式一并迁走，页面里无引用的样式删除
+
 ## 质量检查
 
 生成或重构完成后，逐项检查：
@@ -216,6 +240,9 @@ const ExampleModule = (() => {
 - 是否避免引入新的循环依赖
 - 是否没有把纯工具函数错误塞进响应式对象
 - 是否符合当前文件已有命名习惯
+- 拆分出的组件是否为纯展示（emits 上抛动作，逻辑留在模块）
+- 弹窗组件显隐是否用 `defineModel<boolean>` 而非 props 透传 visible
+- `defineProps` 是否统一用了 `withDefaults` 包裹
 
 ## 输出要求
 
@@ -247,6 +274,9 @@ const ExampleModule = (() => {
 - 为了“封装”而增加不必要的层级
 - 定义空的或仅转发的 `init` / `initOnMounted` 具名函数（初始化与挂载逻辑直接内联）
 - 表单字段散落平铺在响应体里（应聚合为对象）
+- 组件里写业务逻辑（应上抛 emits 由模块处理）
+- 弹窗开关通过 props 传模块 visible 字段（应用 defineModel + v-model）
+- 裸用 `defineProps`（应统一 `withDefaults(defineProps<...>(), {...})`）
 
 ## 示例提示词
 
