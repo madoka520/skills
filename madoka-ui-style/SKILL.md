@@ -1,6 +1,6 @@
 ---
 name: madoka-ui-style
-description: 我的 CSS UI 编程风格（提炼自 madohomu-sanctuary 项目）：粉色治愈系 + 毛玻璃 + 微动效的 Vue SFC 样式写法。在为新组件/页面写 style、做 UI 迭代、写任何 Vue 组件样式、用户提到「用我的风格」「按我的 UI 风格写」「写一个 xx 组件」或要求粉色/毛玻璃/梦幻风格界面时使用 —— 即使没明说风格也要用。
+description: 我的 CSS UI 编程风格(提炼自 madohomu-sanctuary 项目)。为任何 web 项目写 UI、写组件样式、做 UI 迭代时使用——第一节「app 化通用习惯」不限框架不限主题,任何 web 界面都照做;其后为粉色治愈系 + 毛玻璃 + 微动效的具体风格令牌(madoka 系项目用)。用户提到「用我的风格」「按我的 UI 风格写」「写一个 xx 组件」或要求粉色/毛玻璃/梦幻风格界面时也触发。
 ---
 
 # madoka-ui-style —— 我的 CSS UI 风格
@@ -9,11 +9,19 @@ description: 我的 CSS UI 编程风格（提炼自 madohomu-sanctuary 项目）
 核心气质：**粉色治愈系 × 毛玻璃 × 到处都有细腻微动效 × 注释带二次元魂**。
 写出来的界面应该像「魔法少女发动魔法」：安静时柔和半透明，交互时绽放光晕。
 
+## app 化通用习惯（不限框架、不限主题，任何 web 项目照做）
+
+界面是 app 不是网页，以下规则由此推导：
+
+- **文字默认不可选**：在项目入口 `index.html` 全局设 `* { user-select: none }` 并对 `input, textarea` 放开 `user-select: text` —— 比逐组件挂可靠（命名视图/Teleport/独立弹层全覆盖）；只有明确给用户复制的区域（代码块、错误详情、路径）才局部放开 `user-select: text`。组件库组件自带 `user-select: none` 保留（任意宿主自洽），业务组件里不再写这条
+- **不写 cursor:pointer**：交互元素保持系统默认光标，可点击性靠 hover/active 的样式变化（边框、光晕、位移）表达
+- **必有过渡反馈**：每个可交互元素都有 transition，**没有过渡的状态突变是不存在的**；hover 有反馈（scale / translateY / 发光增强），active 至少 `opacity: 0.7` 或加深底色；具体时长与曲线用下面动效节的令牌
+- **界面文案中文**：文案、占位符、提示语全部中文
+
 ## 默认形态（2026-09 定稿，优先级最高）
 
 - **新组件默认直角**：`border-radius: 0`，靠细边框成形；圆角只在用户明确要求时使用
 - **卡片默认不加背景填充**：透明底 + 直角细边框（如 `border: 1.5px solid rgba(255, 183, 197, 0.45)`），交互态只变化边框颜色 + 光晕投影
-- 禁用 cursor:pointer、文字默认不可选、必有过渡反馈这三条 app 化习惯**不限本风格，已独立成 `web-app-ui-habits` skill**（所有 web 项目适用）；本 skill 只管风格令牌与形态
 - 毛玻璃/大圆角属于旧版气质：仅存量组件保留，迭代时不主动扩散到新组件
 
 ## 设计令牌（Design Tokens）
@@ -78,7 +86,7 @@ text-shadow: 0 0 2px white, 0 1px 2px rgba(255, 120, 180, 0.5);
 - **永远 scoped**，需要穿透时用 `:deep(selector)`
 - **LESS 嵌套优先**：状态用 `&:hover`、`&.is-checked` 嵌在宿主选择器里，不铺平
 - 样式块顶部先定义本组件的 less 变量（`@pink-primary` 等），不引全局主题文件
-- JS 可变的值用 CSS 变量 + `v-bind()` 下发：`--primary-color: v-bind(color)`
+- JS 可变的值用 CSS 变量 + `v-bind()` 下发：`--primary-color: v-bind(color)`（注意：`v-bind()` 出现在 `color-mix()` 等函数参数里 less 解析不了，改走容器 `:style` 下发 CSS 变量）
 - 跨层级控制（如歌词换色）通过 CSS 变量注入：`--lyric-base-color: #ff6b8a`
 - 布局用全局工具类（项目 `layout.less` 已有）：`.flex` `.flex-center` `.flex-col` `.w-full` `.h-full`，模板里直接挂 class，不在 style 里重复写
 - 图标统一 MDI：`<i class="mdi mdi-heart" />`
@@ -113,12 +121,11 @@ cubic-bezier(0.16, 1, 0.3, 1)
 
 ### 必做的微交互
 
-（「每个可交互元素都有 transition」「hover 反馈」两条通用规则在 `web-app-ui-habits`,此处只列风格特有的微交互形态）
-
-1. **伪元素做装饰线**：下划线用 `::after { transform: scaleX(0); transform-origin: center }`，hover/focus 时 `scaleX(1)` 或 `scaleX(0.6)`；链接下划线用 `width: 0 → 100%`
-2. **focus-within 容器级聚焦**：输入框聚焦时整个容器变色 + 图标 `scale(1.1) rotate(5deg)`
-3. **pop-in 弹入**：勾选图标 `scale(0)→1` + 弹跳曲线，0.2s
-4. **氛围动画**：`float` / `float-slow` / `twinkle` / `pulse` 等无限循环，缓慢位移或呼吸透明度，给页面「活着」的感觉
+1. **hover 反馈的量化形式**：`transform: scale(1.02~1.1)` / `translateY(-2px)` / `opacity 0.7→1`，配合发光增强；按钮 hover 可加一次性弹跳 keyframe（scale 1→1.04→1）
+2. **伪元素做装饰线**：下划线用 `::after { transform: scaleX(0); transform-origin: center }`，hover/focus 时 `scaleX(1)` 或 `scaleX(0.6)`；链接下划线用 `width: 0 → 100%`
+3. **focus-within 容器级聚焦**：输入框聚焦时整个容器变色 + 图标 `scale(1.1) rotate(5deg)`
+4. **pop-in 弹入**：勾选图标 `scale(0)→1` + 弹跳曲线，0.2s
+5. **氛围动画**：`float` / `float-slow` / `twinkle` / `pulse` 等无限循环，缓慢位移或呼吸透明度，给页面「活着」的感觉
 
 ### JS + CSS 混合动画（进出场）
 
@@ -129,7 +136,6 @@ cubic-bezier(0.16, 1, 0.3, 1)
 requestAnimationFrame(() => el.classList.add('enter-active'))
 // 离场：加 leave-active，监听 transitionend 后清理 class、还原内联样式、把元素挪回屏幕外
 el.addEventListener('transitionend', onEnd)
-// 隐藏元素不是 display:none，是停在 left: -99999px
 ```
 
 弹窗进场从鼠标位置缩小态 `scale(0.1)` 过渡到居中 `scale(1)`。
@@ -160,6 +166,9 @@ el.addEventListener('transitionend', onEnd)
 
 - ❌ 纯黑/纯灰阴影 —— 阴影必须带色调（粉或场景色）
 - ❌ 新组件默认使用圆角/背景填充 —— 默认形态是直角 + 透明底 + 细边框（见「默认形态」节），圆角与毛玻璃仅在明确要求时使用
+- ❌ 给交互元素写 cursor:pointer（见「app 化通用习惯」节）
+- ❌ 漏 user-select（入口全局已设，业务组件不用再写；新项目要记得抄进 index.html）
+- ❌ 无过渡的瞬间状态切换
 - ❌ 铺平的 CSS（不用嵌套）、全局裸选择器
 - ❌ 干巴巴的英文注释
 
