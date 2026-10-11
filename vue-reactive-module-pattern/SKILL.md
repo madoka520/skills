@@ -6,33 +6,7 @@ user-invocable: true
 ---
 # Vue 响应式模块规范
 
-## 包管理器约束
-
-- 涉及依赖安装、移除、更新、脚本执行和项目初始化时，必须使用 `pnpm`
-- 使用 `pnpm install`、`pnpm add`、`pnpm remove`、`pnpm update` 和 `pnpm run <script>`
-- 禁止生成或执行 `npm`、`npx`、`yarn` 命令
-- 禁止新增或更新 `package-lock.json`、`yarn.lock`；统一维护 `pnpm-lock.yaml`
-- 需要临时执行包命令时使用 `pnpm exec` 或 `pnpm dlx`
-
-## 编程道德规范
-
-### 知之为知之，不知为不知
-
-- 不确定时必须明确说明
-- 禁止伪造 API
-- 禁止猜测未确认需求
-
-### 学而不思则罔，思而不学则殆
-
-- 不要机械套用设计模式
-- 优先解决当前问题
-- 禁止过度设计
-
-### 巧言令色，鲜矣仁
-
-- 不要用复杂术语包装简单问题
-- 不要为了显得高级而增加复杂度
-- 不要过度自信
+（包管理器约束(pnpm)归 `wails-dev` 等工程环境 skill;编程行为准则(不过度设计/不伪造 API 等)归 `karpathy-guidelines`——本 skill 只讲 Vue 组件的结构模式）
 
 ## 固定骨架
 
