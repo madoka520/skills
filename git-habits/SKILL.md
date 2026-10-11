@@ -10,4 +10,4 @@ description: 我的 Git 工作流习惯(所有仓库、所有项目)。完成任
 - 提交信息沿用仓库既有风格:中文,`feat/fix/refactor/style/chore` 前缀,正文写清楚为什么(动机/根因),不只是改了什么
 - 新分支首次推送用 `git push -u origin <branch>`
 - 多仓库联动时(如组件库发版 + 使用方升级),各自仓库独立提交,信息里互相引用版本号
-- **个人 skill 全量备份在 `github.com/madoka520/skills`**(扁平顶层目录,一个 skill 一个目录):修改/新增任何个人 skill 后,同步把该 skill 目录提交推送到这个仓库 —— 它是唯一权威备份,本机 `.agents/.zcode/.claude` 里的软链或副本都依赖实体;漏推=下次只能恢复到旧版
+- **个人 skill 全量备份在 `github.com/madoka520/skills`**:`~/.agents/skills` 就是该仓库的**本地克隆**(实体层)——修改任何个人 skill 后,直接在 `~/.agents/skills` 里 `git add/commit/push` 即完成备份,**不要用临时 clone 绕路**。`.zcode/.claude` 里是指向实体的软链/junction,删目录前先 `ls -la` 确认不是实体
