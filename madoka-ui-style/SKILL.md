@@ -113,12 +113,12 @@ cubic-bezier(0.16, 1, 0.3, 1)
 
 ### 必做的微交互
 
-1. **每个可交互元素都有 transition** —— 没有过渡的突变是不存在的
-2. **hover 反馈**：`transform: scale(1.02~1.1)` / `translateY(-2px)` / `opacity 0.7→1`，配合发光增强；按钮 hover 可加一次性弹跳 keyframe（scale 1→1.04→1）
-3. **伪元素做装饰线**：下划线用 `::after { transform: scaleX(0); transform-origin: center }`，hover/focus 时 `scaleX(1)` 或 `scaleX(0.6)`；链接下划线用 `width: 0 → 100%`
-4. **focus-within 容器级聚焦**：输入框聚焦时整个容器变色 + 图标 `scale(1.1) rotate(5deg)`
-5. **pop-in 弹入**：勾选图标 `scale(0)→1` + 弹跳曲线，0.2s
-6. **氛围动画**：`float` / `float-slow` / `twinkle` / `pulse` 等无限循环，缓慢位移或呼吸透明度，给页面「活着」的感觉
+（「每个可交互元素都有 transition」「hover 反馈」两条通用规则在 `web-app-ui-habits`,此处只列风格特有的微交互形态）
+
+1. **伪元素做装饰线**：下划线用 `::after { transform: scaleX(0); transform-origin: center }`，hover/focus 时 `scaleX(1)` 或 `scaleX(0.6)`；链接下划线用 `width: 0 → 100%`
+2. **focus-within 容器级聚焦**：输入框聚焦时整个容器变色 + 图标 `scale(1.1) rotate(5deg)`
+3. **pop-in 弹入**：勾选图标 `scale(0)→1` + 弹跳曲线，0.2s
+4. **氛围动画**：`float` / `float-slow` / `twinkle` / `pulse` 等无限循环，缓慢位移或呼吸透明度，给页面「活着」的感觉
 
 ### JS + CSS 混合动画（进出场）
 
@@ -162,8 +162,6 @@ el.addEventListener('transitionend', onEnd)
 - ❌ 新组件默认使用圆角/背景填充 —— 默认形态是直角 + 透明底 + 细边框（见「默认形态」节），圆角与毛玻璃仅在明确要求时使用
 - ❌ 铺平的 CSS（不用嵌套）、全局裸选择器
 - ❌ 干巴巴的英文注释
-
-（cursor / user-select / 过渡反馈三条 app 化反模式已随通用习惯迁入 `web-app-ui-habits` skill）
 
 ## 完整组件配方
 
