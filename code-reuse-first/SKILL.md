@@ -5,7 +5,19 @@ description: 通用编码铁律(任何项目、任何语言)。写任何组件/�
 
 # 复用优先与强制拆分
 
-写任何东西之前,按下面的顺序从上往下找,**找不到才往下走**。
+写任何东西之前，按下面的顺序从上往下找,**找不到才往下走**。
+
+## 第零步:过一遍相关 skill(写代码前必查)
+
+写代码前先扫一遍已安装的 skill,与当前任务匹配的必须先加载再动手:
+
+- **写 Vue 组件/store/hooks** → 先过 `vue-reactive-module-pattern`(f/s 骨架、箭头函数、reactive 结构)
+- **写 UI 样式** → 先过 `madoka-ui-style`(令牌、动效、BEM-lite)和 `web-app-ui-habits`(user-select/cursor/过渡)
+- **写 Go 后端** → 先过 `wails-dev`(bindings、命令环境)
+- **改存量代码** → 先过 `preserve-existing-code`(旧代码注释保留)
+- **做完改动** → 过 `git-habits`(自动 commit+push)
+
+跳过这步直接写 = 复犯(2026-10-12 已三次:Pinia 单例、手写按钮、Vue 骨架不符)。
 
 ## 取用优先级
 
