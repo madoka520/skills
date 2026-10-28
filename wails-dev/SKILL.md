@@ -44,3 +44,22 @@ PATH="/c/msys64/mingw64/bin:$PATH" go build . ./backend/...
 
 - 验证前端不需要单独 `pnpm dev`:根目录 `dev.cmd` 起 `wails3 dev` 会自动带起前端,端口 9245
 - Taskfile 里给 pnpm 传参直接跟在后面,**不要写 `--` 分隔**(会原样传给 vite,导致端口参数失效跑回 5173)
+
+## NAS 环境(192.168.10.11)
+
+- 登录:`ssh -i ~/.ssh/id_rsa madoka@192.168.10.11`(密码登录关了,只用 key)
+- 目录铁律:`/mnt/data/server` 只放服务本体二进制,`/mnt/data/config` 放配置(mysql.json、saucenao_api_key),`/mnt/data/cache` 放缓存(thumbnails),`/mnt/data/picture` 放图库图片
+- **MySQL 跑在 podman 容器里(容器名 `madoka-mysql`,属于 madoka 用户,root/sudo 看不到,也没有 docker、宿主机没装 mysql 客户端)**:
+
+```bash
+PW=$(python3 -c "import json;print(json.load(open('/mnt/data/config/mysql.json'))['password'])")
+podman exec madoka-mysql mysql -umadoka -p"$PW" madoka_nas -e "<SQL>"
+```
+
+- 后端服务 gallery-server:systemd 单元 `madoka-gallery`,只监听 `127.0.0.1:9300`,由 wails 端 SSH 隧道访问;改完 Go 代码要交叉编译部署:
+
+```bash
+cd <项目>/server && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o gallery-server-linux ./cmd/gallery-server
+scp gallery-server-linux madoka@192.168.10.11:/mnt/data/server/gallery-server.new
+# NAS 上:mv 覆盖 + chmod +x + sudo systemctl restart madoka-gallery
+```
